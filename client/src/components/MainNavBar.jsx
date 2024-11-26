@@ -1,6 +1,5 @@
-
-
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const MainNavBar = () => {
   return (
@@ -8,10 +7,9 @@ const MainNavBar = () => {
       <header className="bg-success text-white">
         <nav className="navbar navbar-expand-lg navbar-light bg-success">
           <div className="container">
-            <a className="navbar-brand text-white" href="#">
-              {/* Font Awesome icon */}
+            
               <i className="fas fa-leaf"></i> Eco Friendly Market Place
-            </a>
+           
             <button
               className="navbar-toggler"
               type="button"
@@ -26,56 +24,54 @@ const MainNavBar = () => {
             <div className="collapse navbar-collapse" id="navbarNav">
               <ul className="navbar-nav ms-auto">
                 <li className="nav-item">
-                  <a className="nav-link active text-white" aria-current="page" href="#">
+                  <Link className="nav-link active text-white" aria-current="page" to="/">
                     Home
-                  </a>
+                  </Link>
                 </li>
-
                 <li className="nav-item dropdown">
-                  <a
+                  <Link
                     className="nav-link dropdown-toggle text-white"
-                    href="#"
+                    to="/sell"
                     id="navbarDropdown"
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
                     Sell
-                  </a>
+                  </Link>
                   <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <Link className="dropdown-item" to="/sell/items">
                         <i className="fas fa-box-open"></i> Items
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <Link className="dropdown-item" to="/sell/vehicles">
                         <i className="fas fa-car"></i> Vehicles
-                      </a>
+                      </Link>
                     </li>
                     <li>
-                      <a className="dropdown-item" href="#">
+                      <Link className="dropdown-item" to="/sell/homes">
                         <i className="fas fa-home"></i> Home for Sale or Rent
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>
-
                 <li className="nav-item">
-                  <a className="nav-link text-white" href="#">
+                  <Link className="nav-link text-white" to="/buy">
                     Buy
-                  </a>
+                  </Link>
                 </li>
                 <li className="nav-item">
-                  <a className="nav-link text-white" href="#">
+                  <Link className="nav-link text-white" to="/about">
                     About
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
-            <a className="text-light" href="./User-profile.html">
+            <Link className="text-light" to="/user-profile">
               <i className="fas fa-user fs-3"></i>
-            </a>
+            </Link>
           </div>
         </nav>
 
@@ -84,79 +80,72 @@ const MainNavBar = () => {
         <div className="second-nav d-flex justify-content-between align-items-center g-3 container-fluid pb-3">
           <div className="dropdowns d-flex">
             <div className="dropdown me-3">
-              <a
+              <button
                 className="btn btn-dark dropdown-toggle"
-                href="#"
-                role="button"
                 id="dropdownMenuLink"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
                 Filter
-              </a>
-
+              </button>
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/filter/low-to-high">
                     Price low - Price High
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/filter/most-relevant">
                     Most Relevant
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/filter/recommended">
                     Recommended
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
 
             <div className="dropdown">
-              <a
-                className="btn btn-dark btn-secondary dropdown-toggle"
-                href="#"
-                role="button"
+              <button
+                className="btn btn-dark dropdown-toggle"
                 id="dropdownMenuLink"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
                 Categories
-              </a>
-
+              </button>
               <ul className="dropdown-menu" aria-labelledby="dropdownMenuLink">
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/categories/electronics">
                     Electronics
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/categories/furniture">
                     Furniture
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/categories/clothes">
                     Clothes
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/categories/cars">
                     Cars
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a className="dropdown-item" href="#">
+                  <Link className="dropdown-item" to="/categories/machinery">
                     Machinery
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Search button and input field */}
           <div className="input-group w-50">
             <input
               type="text"
@@ -169,10 +158,9 @@ const MainNavBar = () => {
             </button>
           </div>
 
-          {/* Location */}
-          <a href="#" target="_blank" className="text-white">
+          <Link to="/location" className="text-white">
             <i className="fas fa-map-marker-alt"></i> Cape Town
-          </a>
+          </Link>
         </div>
       </header>
     </>
