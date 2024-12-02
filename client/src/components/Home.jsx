@@ -1,7 +1,9 @@
 import React from "react";
+import NavBar from "./NavBar";
 
 const Home = () => {
   return (
+    
     <>
       <main className="mt-5 text-center">
         <div className="container mb3">

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Sell = () => {
+const SellHome = () => {
   const [itemName, setItemName] = useState('');
   const [itemDescription, setItemDescription] = useState('');
   const [itemPrice, setItemPrice] = useState('');
@@ -172,4 +172,4 @@ const Sell = () => {
   );
 };
 
-export default Sell;
+export default SellHome;

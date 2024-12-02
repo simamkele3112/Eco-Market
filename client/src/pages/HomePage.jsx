@@ -4,14 +4,15 @@
  
 
 
-const Home=()=>{
+const HomePage=()=>{
 
 
     return<>
    
-    <Home />
-    <Footer />
+   
+   <Home/>
+   <Footer/>
     </>
 }
 
-export default Home;
+export default HomePage;
