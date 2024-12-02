@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import  ReUseLocation  from  './ReUseLocation'
+
 
 const SellItem = () => {
   const [itemName, setItemName] = useState('');
@@ -72,7 +74,7 @@ const SellItem = () => {
             {/* Item Price */}
             <div className="mb-3">
               <label htmlFor="itemPrice" className="form-label">
-                Price (in USD)
+                Price (Rands)
               </label>
               <input
                 type="number"
@@ -154,7 +156,7 @@ const SellItem = () => {
                 )}
               </div>
             </div>
-
+            <ReUseLocation/>
             {/* Submit Button */}
             <div className="text-center">
               <button
