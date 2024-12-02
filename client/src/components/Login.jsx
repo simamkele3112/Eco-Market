@@ -1,22 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { auth, signInWithEmailAndPassword } from "./firebase"; // Import Firebase functions
 import SignUp from "./SignUp";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true); // Toggle state for login and signup
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    city: "",
-    state: "",
-    zip: "",
-    agree: false,
+    email: "",
+    password: "",
   });
-
   const [errors, setErrors] = useState({});
+  const [firebaseError, setFirebaseError] = useState(""); // State for Firebase error messages
   const formRef = useRef(null);
+  const navigate = useNavigate();
 
   // GSAP animation on form load
   useEffect(() => {
@@ -28,35 +25,50 @@ const Login = () => {
   }, [isLogin]); // Re-run animation when switching forms
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     });
   };
 
   const validate = () => {
     const newErrors = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required.";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required.";
-    if (!formData.username.trim()) newErrors.username = "Username is required.";
-    if (!formData.city.trim()) newErrors.city = "City is required.";
-    if (!formData.state.trim()) newErrors.state = "Please select a state.";
-    if (!formData.zip.trim() || !/^\d{3}$/.test(formData.zip))
-      newErrors.zip = "Please provide a valid zip code.";
-    if (!formData.agree) newErrors.agree = "You must agree to the terms.";
+    if (!formData.email.trim()) newErrors.email = "Email is required.";
+    if (!formData.password.trim()) newErrors.password = "Password is required.";
 
     setErrors(newErrors);
 
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      console.log("Form data submitted:", formData);
-      alert("Form submitted successfully!");
+      try {
+        if (isLogin) {
+          // Firebase Login
+          const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
+          console.log("User logged in:", userCredential.user); // Log user info
+          alert("Login successful!");
+          navigate("/dashboard"); // Redirect to a dashboard or home page after successful login
+        } else {
+          // Handle signup form submission (you can add signup logic here)
+          alert("Sign up logic is not implemented yet!");
+        }
+      } catch (error) {
+        console.error("Firebase Error:", error); // Log the full error object
+
+        // Handle Firebase authentication errors
+        if (error.code === "auth/user-not-found") {
+          setFirebaseError("User does not exist.");
+        } else if (error.code === "auth/wrong-password") {
+          setFirebaseError("Incorrect password.");
+        } else {
+          setFirebaseError("Login failed. Please try again.");
+        }
+      }
     }
   };
 
@@ -73,18 +85,18 @@ const Login = () => {
           <>
             <div className="row g-3">
               <div className="col-md-12">
-                <label htmlFor="username" className="form-label">
-                  Username
+                <label htmlFor="email" className="form-label">
+                  Email
                 </label>
                 <input
-                  type="text"
-                  className={`form-control ${errors.username ? "is-invalid" : ""}`}
-                  id="username"
-                  name="username"
-                  value={formData.username}
+                  type="email"
+                  className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                  id="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                 />
-                <div className="invalid-feedback">{errors.username}</div>
+                <div className="invalid-feedback">{errors.email}</div>
               </div>
               <div className="col-md-12">
                 <label htmlFor="password" className="form-label">
@@ -92,17 +104,20 @@ const Login = () => {
                 </label>
                 <input
                   type="password"
-                  className="form-control"
+                  className={`form-control ${errors.password ? "is-invalid" : ""}`}
                   id="password"
                   name="password"
+                  value={formData.password}
                   onChange={handleChange}
                 />
+                <div className="invalid-feedback">{errors.password}</div>
               </div>
             </div>
           </>
         ) : (
           <SignUp formData={formData} handleChange={handleChange} errors={errors} />
         )}
+        {firebaseError && <p className="text-danger">{firebaseError}</p>} {/* Display Firebase errors */}
         <div className="col-12 text-center mt-4">
           <button className="btn btn-primary w-100" type="submit">
             {isLogin ? "Login" : "Sign Up"}
