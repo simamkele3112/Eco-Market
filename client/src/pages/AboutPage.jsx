@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaUsers, FaRegLightbulb, FaRegHandshake, FaAward } from 'react-icons/fa';
-import './About.css'; 
+import '../About.css'; 
 
 const About = () => {
   return (

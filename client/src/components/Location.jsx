@@ -1,10 +1,4 @@
 import React, { useState } from "react";
-import {
-  GoogleMap,
-  LoadScript,
-  Autocomplete,
-  Marker,
-} from "@react-google-maps/api";
 
 const Location = () => {
   const [selectedLocation, setSelectedLocation] = useState(null); // For the selected location
