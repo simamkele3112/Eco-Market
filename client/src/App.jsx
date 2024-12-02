@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage'
 import SellItem from './components/SellItem'
 import SellVehicles from './components/SellVehicles'
 import SellHome from './components/SellHome'
-import Profile from './components/Profile'
+import ProfilePage from './pages/ProfilePage'
 import About from './pages/AboutPage'
 import Header from './components/Header'
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
@@ -28,7 +28,7 @@ function App() {
 <Route path='/sell/vehicles' element={ <SellVehicles/>} />
 <Route path='/sell/homes' element={ <SellHome/>} />
 <Route path='/loction' element={ <LocationPage/>} />
-<Route path='/user-profile' element={ <Profile/>} />
+<Route path='/user-profile' element={ <ProfilePage/>} />
 <Route path='/about' element={ <About/>} />
 <Route path='*' element={ <PageNotFound/>} />
 

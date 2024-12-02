@@ -1,13 +1,11 @@
-
-
 import Profile from "../components/Profile";
+import Login from "../components/Login";
 
-const Profile=()=>{
+const ProfilePage = () => {
+  // Simulating authentication status
+  const isAuthenticated = false; 
 
+  return isAuthenticated ? <Profile /> : <Login />;
+};
 
-    return<>
-  <Profile /> 
-    </>
-}
-
-export default Profile;
+export default ProfilePage;
