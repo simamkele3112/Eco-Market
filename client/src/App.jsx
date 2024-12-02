@@ -27,7 +27,7 @@ function App() {
 <Route path='/sell/items' element={ <SellItem/>} />
 <Route path='/sell/vehicles' element={ <SellVehicles/>} />
 <Route path='/sell/homes' element={ <SellHome/>} />
-<Route path='/loction' element={ <LocationPage/>} />
+<Route path='/location' element={ <LocationPage/>} />
 <Route path='/user-profile' element={ <ProfilePage/>} />
 <Route path='/about' element={ <About/>} />
 <Route path='*' element={ <PageNotFound/>} />

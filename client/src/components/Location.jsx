@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { gsap } from "gsap";
 
 const Location = () => {
   const [query, setQuery] = useState("");
@@ -17,7 +18,17 @@ const Location = () => {
       try {
         const response = await fetch(url);
         const data = await response.json();
-        setSuggestions(data.features.map((feature) => feature.properties.formatted));
+        const newSuggestions = data.features.map(
+          (feature) => feature.properties.formatted
+        );
+        setSuggestions(newSuggestions);
+
+        // GSAP Animation for suggestions
+        gsap.fromTo(
+          ".suggestion-item",
+          { opacity: 0, y: -10 },
+          { opacity: 1, y: 0, duration: 0.3, stagger: 0.1 }
+        );
       } catch (error) {
         console.error("Error fetching location suggestions:", error);
       }
@@ -32,62 +43,37 @@ const Location = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h1>Location Autocomplete</h1>
-      <input
-        type="text"
-        value={query}
-        onChange={handleInputChange}
-        placeholder="Type a location..."
-        style={styles.input}
-      />
-      <ul style={styles.suggestions}>
-        {suggestions.map((suggestion, index) => (
-          <li
-            key={index}
-            onClick={() => handleSuggestionClick(suggestion)}
-            style={styles.suggestionItem}
-          >
-            {suggestion}
-          </li>
-        ))}
-      </ul>
+    <div className="container py-4">
+      <div className="row row-cols-md-1">
+
+        <h1 className="text-center mb-4  col-10  ">Location </h1>
+      <div className="mb-3 cols-3  m-auto w-50">
+        <input
+          type="text"
+          className="form-control"
+          value={query}
+          onChange={handleInputChange}
+          placeholder="Type a location..."
+        />
+      </div>
+      {suggestions.length > 0 && (
+        <ul className="list-group">
+          {suggestions.map((suggestion, index) => (
+            <li
+              key={index}
+              className="list-group-item suggestion-item"
+              onClick={() => handleSuggestionClick(suggestion)}
+              style={{ cursor: "pointer" }}
+            >
+              {suggestion}
+            </li>
+          ))}
+        </ul>
+      )}
+      </div>
+      
     </div>
   );
-};
-
-const styles = {
-  container: {
-    fontFamily: "Arial, sans-serif",
-    padding: "20px",
-    maxWidth: "400px",
-    margin: "0 auto",
-  },
-  input: {
-    width: "100%",
-    padding: "10px",
-    fontSize: "16px",
-    boxSizing: "border-box",
-  },
-  suggestions: {
-    listStyleType: "none",
-    padding: 0,
-    margin: "10px 0 0 0",
-    border: "1px solid #ccc",
-    borderRadius: "4px",
-    maxHeight: "150px",
-    overflowY: "auto",
-    background: "white",
-    position: "relative",
-  },
-  suggestionItem: {
-    padding: "10px",
-    cursor: "pointer",
-    borderBottom: "1px solid #eee",
-  },
-  suggestionItemHover: {
-    background: "#f0f0f0",
-  },
 };
 
 export default Location;

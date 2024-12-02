@@ -1,11 +1,13 @@
 import Location from "../components/Location";
 const LocationPage = () => {
 
+  return<>
 
-    <return>
-        <Location/>
-    </return>
- 
+      <Location/>
+    
+    </>
+      
+
 };
 
 export default LocationPage;

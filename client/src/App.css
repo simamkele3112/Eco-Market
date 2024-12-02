@@ -1,0 +1,5 @@
+* {
+    -webkit-font-smoothing: antialiased;  /* For Chrome, Safari, and Opera */
+    -moz-osx-font-smoothing: grayscale;  /* For Firefox on macOS */
+  }
+  
