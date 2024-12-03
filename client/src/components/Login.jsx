@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
-import { auth, signInWithEmailAndPassword } from "./firebase"; // Import Firebase functions
-import SignUp from "./SignUp";
+import { auth, signInWithEmailAndPassword } from "./firebase"; // Firebase imports
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+import Home from "./Home";
+
+// Initialize Firestore
+const db = getFirestore();
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true); // Toggle state for login and signup
@@ -48,11 +53,21 @@ const Login = () => {
     if (validate()) {
       try {
         if (isLogin) {
-          // Firebase Login
+          // Firebase Authentication: Login
           const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
           console.log("User logged in:", userCredential.user); // Log user info
-          alert("Login successful!");
-          navigate("/dashboard"); // Redirect to a dashboard or home page after successful login
+
+          // Check if user exists in Firestore's 'users' collection
+          const userDocRef = doc(db, "users", userCredential.user.uid); // Access 'users' collection using UID
+          const userDoc = await getDoc(userDocRef); // Fetch user document from Firestore
+
+          if (userDoc.exists()) {
+            console.log("User data:", userDoc.data()); // Log user data from Firestore
+            alert("Login successful!");
+            navigate("/"); // Redirect to a dashboard or home page after successful login
+          } else {
+            setFirebaseError("User not found in the database."); // Error if user document does not exist
+          }
         } else {
           // Handle signup form submission (you can add signup logic here)
           alert("Sign up logic is not implemented yet!");
@@ -69,6 +84,8 @@ const Login = () => {
           setFirebaseError("Login failed. Please try again.");
         }
       }
+    } else {
+      setFirebaseError(""); // Clear previous error message if validation fails
     }
   };
 
@@ -115,6 +132,7 @@ const Login = () => {
             </div>
           </>
         ) : (
+          // SignUp form can go here
           <SignUp formData={formData} handleChange={handleChange} errors={errors} />
         )}
         {firebaseError && <p className="text-danger">{firebaseError}</p>} {/* Display Firebase errors */}
