@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import { auth, signInWithEmailAndPassword } from "./firebase"; // Firebase imports
 import { getFirestore, doc, getDoc } from "firebase/firestore";
-
+import SignUp from "./SignUp";
 import Home from "./Home";
 
 // Initialize Firestore
@@ -17,7 +17,9 @@ const Login = () => {
   });
   const [errors, setErrors] = useState({});
   const [firebaseError, setFirebaseError] = useState(""); // State for Firebase error messages
+  const [isLoading, setIsLoading] = useState(false); // Loading state
   const formRef = useRef(null);
+  const loaderRef = useRef(null); // Ref for the loading animation
   const navigate = useNavigate();
 
   // GSAP animation on form load
@@ -51,31 +53,38 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
+      setIsLoading(true); // Start loading animation
+      gsap.fromTo(
+        loaderRef.current,
+        { opacity: 0, scale: 0.8 },
+        { opacity: 1, scale: 1, duration: 0.5, ease: "power2.inOut", repeat: -1, yoyo: true }
+      );
+
       try {
         if (isLogin) {
           // Firebase Authentication: Login
-          const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password);
-          console.log("User logged in:", userCredential.user); // Log user info
+          const userCredential = await signInWithEmailAndPassword(
+            auth,
+            formData.email,
+            formData.password
+          );
 
           // Check if user exists in Firestore's 'users' collection
-          const userDocRef = doc(db, "users", userCredential.user.uid); // Access 'users' collection using UID
-          const userDoc = await getDoc(userDocRef); // Fetch user document from Firestore
+          const userDocRef = doc(db, "users", userCredential.user.uid);
+          const userDoc = await getDoc(userDocRef);
 
           if (userDoc.exists()) {
-            console.log("User data:", userDoc.data()); // Log user data from Firestore
-            alert("Login successful!");
+            console.log("User data:", userDoc.data());
+            
             navigate("/"); // Redirect to a dashboard or home page after successful login
           } else {
-            setFirebaseError("User not found in the database."); // Error if user document does not exist
+            setFirebaseError("User not found in the database.");
           }
         } else {
-          // Handle signup form submission (you can add signup logic here)
           alert("Sign up logic is not implemented yet!");
         }
       } catch (error) {
-        console.error("Firebase Error:", error); // Log the full error object
-
-        // Handle Firebase authentication errors
+        console.error("Firebase Error:", error);
         if (error.code === "auth/user-not-found") {
           setFirebaseError("User does not exist.");
         } else if (error.code === "auth/wrong-password") {
@@ -83,14 +92,20 @@ const Login = () => {
         } else {
           setFirebaseError("Login failed. Please try again.");
         }
+      } finally {
+        setIsLoading(false); // Stop loading animation
+        gsap.to(loaderRef.current, { opacity: 0, scale: 0.8, duration: 0.5 });
       }
     } else {
-      setFirebaseError(""); // Clear previous error message if validation fails
+      setFirebaseError("");
     }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+      <div className="loading-overlay" ref={loaderRef} style={{ display: isLoading ? "flex" : "none" }}>
+        <div className="spinner"></div>
+      </div>
       <form
         className="container p-4 bg-white rounded shadow-lg"
         style={{ maxWidth: "600px" }}
@@ -132,32 +147,25 @@ const Login = () => {
             </div>
           </>
         ) : (
-          // SignUp form can go here
           <SignUp formData={formData} handleChange={handleChange} errors={errors} />
         )}
-        {firebaseError && <p className="text-danger">{firebaseError}</p>} {/* Display Firebase errors */}
+        {firebaseError && <p className="text-danger">{firebaseError}</p>}
         <div className="col-12 text-center mt-4">
-          <button className="btn btn-primary w-100" type="submit">
+          <button className="btn btn-primary w-100" type="submit" disabled={isLoading}>
             {isLogin ? "Login" : "Sign Up"}
           </button>
           <p className="mt-3">
             {isLogin ? (
               <>
                 Don't have an account?{" "}
-                <span
-                  className="text-primary cursor-pointer"
-                  onClick={() => setIsLogin(false)}
-                >
+                <span className="text-primary cursor-pointer" onClick={() => setIsLogin(false)}>
                   Sign Up
                 </span>
               </>
             ) : (
               <>
                 Already have an account?{" "}
-                <span
-                  className="text-primary cursor-pointer"
-                  onClick={() => setIsLogin(true)}
-                >
+                <span className="text-primary cursor-pointer" onClick={() => setIsLogin(true)}>
                   Login
                 </span>
               </>
