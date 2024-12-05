@@ -140,12 +140,12 @@ const Login = () => {
           </div>
           {firebaseError && <p className="text-danger">{firebaseError}</p>}
           <div className="col-12 text-center mt-4">
-            <button className="btn btn-primary w-100" type="submit" disabled={isLoading}>
+            <button className="btn btn-success w-100" type="submit" disabled={isLoading}>
               Login
             </button>
             <p className="mt-3">
               Don't have an account?{" "}
-              <span className="text-primary cursor-pointer" onClick={() => setIsLogin(false)}>
+              <span className="text-success cursor-pointer" onClick={() => setIsLogin(false)}>
                 Sign Up
               </span>
             </p>

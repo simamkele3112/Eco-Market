@@ -234,7 +234,7 @@ const SignUp = () => {
           </div>
         </div>
         <div className="col-12 text-center">
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-success w-100">
             Register
           </button>
         </div>
@@ -251,7 +251,7 @@ const SignUp = () => {
       <div className="mt-3 text-center">
         <p>
           Already have an account?{" "}
-          <a href="/login" className="text-primary">
+          <a href="/login" className="text-success">
             Login here
           </a>
         </p>
