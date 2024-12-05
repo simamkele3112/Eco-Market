@@ -3,7 +3,10 @@ import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
 import { auth, signInWithEmailAndPassword } from "./firebase"; // Firebase imports
 import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+
 import SignUp from "./SignUp";
+
 
 // Initialize Firestore
 const db = getFirestore();
