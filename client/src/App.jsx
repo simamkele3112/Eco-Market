@@ -6,7 +6,7 @@ import SellVehicles from './components/SellVehicles'
 import SellHome from './components/SellHome'
 import ProfilePage from './pages/ProfilePage'
 import About from './pages/AboutPage'
-import Header from './components/Header'
+import Header from './components/Header';
 import {BrowserRouter, Route, Routes} from 'react-router-dom'
 import PageNotFound from './components/PageNotFound'
 
