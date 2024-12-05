@@ -3,7 +3,7 @@ import { gsap } from "gsap";
 import { auth } from "./firebase"; // Adjust the path based on your file structure
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import "./Login.css"; // Add your additional custom styles if needed
+
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
