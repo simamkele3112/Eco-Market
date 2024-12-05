@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { auth } from "./firebase"; // Adjust the path based on your file structure
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import "./Login.css"; // Add your additional custom styles if needed
 
 const SignUp = () => {
@@ -20,6 +21,7 @@ const SignUp = () => {
   const [errors, setErrors] = useState({});
   const [firebaseError, setFirebaseError] = useState("");
   const formRef = useRef(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // GSAP animation on form load
   useEffect(() => {
@@ -81,6 +83,9 @@ const SignUp = () => {
         );
         console.log("User registered:", userCredential.user);
         alert("Account created successfully!");
+
+        // Navigate to login page after successful sign-up
+        navigate("/login"); // Adjust route as needed
       } catch (error) {
         console.error("Error creating user:", error.message);
         setFirebaseError(`Failed to create account: ${error.message}`);
@@ -157,9 +162,7 @@ const SignUp = () => {
           </label>
           <input
             type="password"
-            className={`form-control ${
-              errors.confirmPassword ? "is-invalid" : ""
-            }`}
+            className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
             id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
@@ -243,6 +246,16 @@ const SignUp = () => {
           {firebaseError}
         </div>
       )}
+
+      {/* Link to Login Page */}
+      <div className="mt-3 text-center">
+        <p>
+          Already have an account?{" "}
+          <a href="/login" className="text-primary">
+            Login here
+          </a>
+        </p>
+      </div>
     </form>
   );
 };
