@@ -7,7 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 
 mongoose
-	.connect("mongodb://localhost:27017/marketplace", {
+	.connect("mongodb://localhost:2701/marketplace", {  // this main route      
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
