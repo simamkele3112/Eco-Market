@@ -1,15 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { useNavigate } from "react-router-dom";
-import { auth, signInWithEmailAndPassword } from "./firebase"; // Firebase imports
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-
-
 import SignUp from "./SignUp";
-
-
-// Initialize Firestore
-const db = getFirestore();
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true); // Toggle state for login and signup
@@ -18,7 +10,7 @@ const Login = () => {
     password: "",
   });
   const [errors, setErrors] = useState({});
-  const [firebaseError, setFirebaseError] = useState(""); // State for Firebase error messages
+  const [serverError, setServerError] = useState("");
   const [isLoading, setIsLoading] = useState(false); // Loading state
   const formRef = useRef(null);
   const loaderRef = useRef(null); // Ref for the loading animation
@@ -63,38 +55,35 @@ const Login = () => {
       );
 
       try {
-        // Firebase Authentication: Login
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password
-        );
+        const endpoint = isLogin
+          ? "http://localhost:3000/login"
+          : "http://localhost:3000/register";
 
-        // Check if user exists in Firestore's 'users' collection
-        const userDocRef = doc(db, "users", userCredential.user.uid);
-        const userDoc = await getDoc(userDocRef);
+        const response = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
 
-        if (userDoc.exists()) {
-          console.log("User data:", userDoc.data());
-          navigate("/"); // Redirect to a dashboard or home page after successful login
+        const result = await response.json();
+
+        if (response.ok) {
+          console.log("Server Response:", result);
+          navigate("/"); // Redirect to dashboard or home page
         } else {
-          setFirebaseError("User not found in the database.");
+          setServerError(result.message || "An error occurred.");
         }
       } catch (error) {
-        console.error("Firebase Error:", error);
-        if (error.code === "auth/user-not-found") {
-          setFirebaseError("User does not exist.");
-        } else if (error.code === "auth/wrong-password") {
-          setFirebaseError("Incorrect password.");
-        } else {
-          setFirebaseError("Login failed. Please try again.");
-        }
+        console.error("Error:", error);
+        setServerError("Something went wrong. Please try again later.");
       } finally {
         setIsLoading(false); // Stop loading animation
         gsap.to(loaderRef.current, { opacity: 0, scale: 0.8, duration: 0.5 });
       }
     } else {
-      setFirebaseError("");
+      setServerError("");
     }
   };
 
@@ -141,15 +130,15 @@ const Login = () => {
               <div className="invalid-feedback">{errors.password}</div>
             </div>
           </div>
-          {firebaseError && <p className="text-danger">{firebaseError}</p>}
+          {serverError && <p className="text-danger">{serverError}</p>}
           <div className="col-12 text-center mt-4">
             <button className="btn btn-success w-100" type="submit" disabled={isLoading}>
-              Login
+              {isLogin ? "Login" : "Register"}
             </button>
             <p className="mt-3">
-              Don't have an account?{" "}
-              <span className="text-success cursor-pointer" onClick={() => setIsLogin(false)}>
-                Sign Up
+              {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+              <span className="text-success cursor-pointer" onClick={() => setIsLogin(!isLogin)}>
+                {isLogin ? "Sign Up" : "Login"}
               </span>
             </p>
           </div>
