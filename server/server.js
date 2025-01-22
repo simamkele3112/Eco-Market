@@ -171,6 +171,136 @@ app.put('/reset-password', isAuthenticated, async (req, res) => {
     }
 });
 
+
+// Routes for Product and Wishlist
+
+// Create a product
+app.post('/product', isAuthenticated, async (req, res) => {
+    const { name, description, price, category, condition, imageUrl, sellingLocation } = req.body;
+    try {
+        const product = new Product({
+            name,
+            description,
+            price,
+            owner: req.session.userId,
+            category,
+            condition,
+            imageUrl,
+            sellingLocation
+        });
+        await product.save();
+        res.status(201).json({ message: 'Product added successfully', product });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update a product
+app.put('/product/:productId', isAuthenticated, async (req, res) => {
+    const { productId } = req.params;
+    const { name, description, price, category, condition, imageUrl, sellingLocation } = req.body;
+    try {
+        const product = await Product.findOne({ _id: productId, owner: req.session.userId });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found or unauthorized' });
+        }
+
+        product.name = name || product.name;
+        product.description = description || product.description;
+        product.price = price || product.price;
+        product.category = category || product.category;
+        product.condition = condition || product.condition;
+        product.imageUrl = imageUrl || product.imageUrl;
+        product.sellingLocation = sellingLocation || product.sellingLocation;
+
+        await product.save();
+        res.json({ message: 'Product updated successfully', product });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Remove a product
+app.delete('/product/:productId', isAuthenticated, async (req, res) => {
+    const { productId } = req.params;
+    try {
+        const product = await Product.findOneAndDelete({ _id: productId, owner: req.session.userId });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found or unauthorized' });
+        }
+        res.json({ message: 'Product removed successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Mark a product as sold
+app.put('/product/sold/:productId', isAuthenticated, async (req, res) => {
+    const { productId } = req.params;
+    try {
+        const product = await Product.findOne({ _id: productId, owner: req.session.userId });
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found or unauthorized' });
+        }
+
+        product.condition = 'sold';
+        await product.save();
+        res.json({ message: 'Product marked as sold', product });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Add a product to wishlist
+app.post('/wishlist', isAuthenticated, async (req, res) => {
+    const { productId } = req.body;
+    try {
+        let wishlist = await Wishlist.findOne({ user: req.session.userId });
+        if (!wishlist) {
+            wishlist = new Wishlist({ user: req.session.userId, products: [] });
+        }
+        if (!wishlist.products.includes(productId)) {
+            wishlist.products.push(productId);
+            await wishlist.save();
+            res.status(201).json({ message: 'Product added to wishlist', wishlist });
+        } else {
+            res.status(400).json({ message: 'Product already in wishlist' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Remove a product from wishlist
+app.delete('/wishlist/:productId', isAuthenticated, async (req, res) => {
+    const { productId } = req.params;
+    try {
+        const wishlist = await Wishlist.findOne({ user: req.session.userId });
+        if (!wishlist) {
+            return res.status(404).json({ message: 'Wishlist not found' });
+        }
+        wishlist.products = wishlist.products.filter(id => !id.equals(productId));
+        await wishlist.save();
+        res.json({ message: 'Product removed from wishlist', wishlist });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// View a user's wishlist
+app.get('/wishlist', isAuthenticated, async (req, res) => {
+    try {
+        const wishlist = await Wishlist.findOne({ user: req.session.userId }).populate('products');
+        if (!wishlist) {
+            return res.status(404).json({ message: 'Wishlist not found' });
+        }
+        res.json({ wishlist });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
