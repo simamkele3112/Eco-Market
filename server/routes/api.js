@@ -1,15 +1,15 @@
 const express = require("express");
 const { register, login } = require("../controllers/authController");
 const {
-	addProduct,
-	getAllProducts,
-	getProductsByLocation,
-	searchProducts,
-	deleteProduct,
+  addProduct,
+  getAllProducts,
+  getProductsByLocation,
+  searchProducts,
+  deleteProduct,
 } = require("../controllers/productController");
 const {
-	addToWishlist,
-	removeFromWishlist,
+  addToWishlist,
+  removeFromWishlist,
 } = require("../controllers/wishlistController");
 const authenticate = require("../middleware/authMiddleware");
 
