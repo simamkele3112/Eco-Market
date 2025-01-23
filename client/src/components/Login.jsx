@@ -56,8 +56,8 @@ const Login = () => {
 
       try {
         const endpoint = isLogin
-          ? "http://localhost:3000/login"
-          : "http://localhost:3000/register";
+          ? "http://localhost:3000/auth/login"
+          : "http://localhost:3000/auth/register";
 
         const response = await fetch(endpoint, {
           method: "POST",
@@ -89,9 +89,11 @@ const Login = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+      {/* Loading animation */}
       <div className="loading-overlay" ref={loaderRef} style={{ display: isLoading ? "flex" : "none" }}>
         <div className="spinner"></div>
       </div>
+
       {isLogin ? (
         <form
           className="container p-4 bg-white rounded shadow-lg"
