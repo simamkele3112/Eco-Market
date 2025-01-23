@@ -16,18 +16,19 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// Database connection
+mongoose.connect(process.env.zz, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+}).then(() => console.log('MongoDB connecyzted')).catch(err => console.error(err));
 
-// Configure session
+// Session configuration
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'defaultSecret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
+        mongoUrl: process.env.MONGO_URI,
     }),
     cookie: {
         maxAge: 1000 * 60 * 60, // 1 hour
@@ -37,11 +38,8 @@ app.use(session({
 
 // Mongoose Schemas
 const UserSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    surname: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    address: { type: String },
 });
 
 const ProductSchema = new mongoose.Schema({
@@ -72,24 +70,11 @@ const isAuthenticated = (req, res, next) => {
 
 // User registration
 app.post('/register', async (req, res) => {
-    const { name, surname, password, email, address } = req.body;
-
-    console.log('Received registration data:', req.body); // Log the incoming data
-
-    // Check if the email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-        return res.status(400).json({ message: 'Email already exists' });
-    }
-
+    const { username, password } = req.body;
     try {
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create and save the new user
-        const user = new User({ name, surname, email, password: hashedPassword, address });
+        const user = new User({ username, password: hashedPassword });
         await user.save();
-
         res.status(201).json({ message: 'User registered successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -112,82 +97,13 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Update profile details
-app.put('/update-profile', isAuthenticated, async (req, res) => {
-    const { name, surname, email, address } = req.body;
-    try {
-        const user = await User.findById(req.session.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        user.name = name || user.name;
-        user.surname = surname || user.surname;
-        user.email = email || user.email;
-        user.address = address || user.address;
-
-        await user.save();
-        res.json({ message: 'Profile updated successfully' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Delete account
-app.delete('/delete-account', isAuthenticated, async (req, res) => {
-    try {
-        const user = await User.findByIdAndDelete(req.session.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-        res.json({ message: 'Account deleted successfully' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Reset password
-app.put('/reset-password', isAuthenticated, async (req, res) => {
-    const { oldPassword, newPassword } = req.body;
+// Add product
+app.post('/products', isAuthenticated, async (req, res) => {
+    const { name, description, price } = req.body;
+    const userId = req.session.userId;
 
     try {
-        const user = await User.findById(req.session.userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
-        if (!isPasswordMatch) {
-            return res.status(400).json({ message: 'Incorrect current password' });
-        }
-
-        const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-        user.password = hashedNewPassword;
-
-        await user.save();
-        res.json({ message: 'Password reset successfully' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-
-// Routes for Product and Wishlist
-
-// Create a product
-app.post('/product', isAuthenticated, async (req, res) => {
-    const { name, description, price, category, condition, imageUrl, sellingLocation } = req.body;
-    try {
-        const product = new Product({
-            name,
-            description,
-            price,
-            owner: req.session.userId,
-            category,
-            condition,
-            imageUrl,
-            sellingLocation
-        });
+        const product = new Product({ name, description, price, owner: userId });
         await product.save();
         res.status(201).json({ message: 'Product added successfully', product });
     } catch (err) {
@@ -195,111 +111,68 @@ app.post('/product', isAuthenticated, async (req, res) => {
     }
 });
 
-// Update a product
-app.put('/product/:productId', isAuthenticated, async (req, res) => {
-    const { productId } = req.params;
-    const { name, description, price, category, condition, imageUrl, sellingLocation } = req.body;
+// Delete product
+app.delete('/products/:id', isAuthenticated, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.session.userId;
+
     try {
-        const product = await Product.findOne({ _id: productId, owner: req.session.userId });
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found or unauthorized' });
-        }
+        const product = await Product.findById(id);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
 
-        product.name = name || product.name;
-        product.description = description || product.description;
-        product.price = price || product.price;
-        product.category = category || product.category;
-        product.condition = condition || product.condition;
-        product.imageUrl = imageUrl || product.imageUrl;
-        product.sellingLocation = sellingLocation || product.sellingLocation;
+        if (!product.owner.equals(userId)) return res.status(403).json({ message: 'Forbidden' });
 
+        await product.delete();
+        res.json({ message: 'Product deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Update product
+app.put('/products/:id', isAuthenticated, async (req, res) => {
+    const { id } = req.params;
+    const { name, description, price } = req.body;
+    const userId = req.session.userId;
+
+    try {
+        const product = await Product.findById(id);
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+
+        if (!product.owner.equals(userId)) return res.status(403).json({ message: 'Forbidden' });
+
+        product.name = name;
+        product.description = description;
+        product.price = price;
         await product.save();
+
         res.json({ message: 'Product updated successfully', product });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Remove a product
-app.delete('/product/:productId', isAuthenticated, async (req, res) => {
-    const { productId } = req.params;
-    try {
-        const product = await Product.findOneAndDelete({ _id: productId, owner: req.session.userId });
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found or unauthorized' });
-        }
-        res.json({ message: 'Product removed successfully' });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Mark a product as sold
-app.put('/product/sold/:productId', isAuthenticated, async (req, res) => {
-    const { productId } = req.params;
-    try {
-        const product = await Product.findOne({ _id: productId, owner: req.session.userId });
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found or unauthorized' });
-        }
-
-        product.condition = 'sold';
-        await product.save();
-        res.json({ message: 'Product marked as sold', product });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Add a product to wishlist
+// Add to wishlist
 app.post('/wishlist', isAuthenticated, async (req, res) => {
     const { productId } = req.body;
+    const userId = req.session.userId;
+
     try {
-        let wishlist = await Wishlist.findOne({ user: req.session.userId });
+        let wishlist = await Wishlist.findOne({ user: userId });
         if (!wishlist) {
-            wishlist = new Wishlist({ user: req.session.userId, products: [] });
+            wishlist = new Wishlist({ user: userId, products: [] });
         }
+
         if (!wishlist.products.includes(productId)) {
             wishlist.products.push(productId);
             await wishlist.save();
-            res.status(201).json({ message: 'Product added to wishlist', wishlist });
-        } else {
-            res.status(400).json({ message: 'Product already in wishlist' });
         }
+
+        res.json({ message: 'Product added to wishlist', wishlist });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
-
-// Remove a product from wishlist
-app.delete('/wishlist/:productId', isAuthenticated, async (req, res) => {
-    const { productId } = req.params;
-    try {
-        const wishlist = await Wishlist.findOne({ user: req.session.userId });
-        if (!wishlist) {
-            return res.status(404).json({ message: 'Wishlist not found' });
-        }
-        wishlist.products = wishlist.products.filter(id => !id.equals(productId));
-        await wishlist.save();
-        res.json({ message: 'Product removed from wishlist', wishlist });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// View a user's wishlist
-app.get('/wishlist', isAuthenticated, async (req, res) => {
-    try {
-        const wishlist = await Wishlist.findOne({ user: req.session.userId }).populate('products');
-        if (!wishlist) {
-            return res.status(404).json({ message: 'Wishlist not found' });
-        }
-        res.json({ wishlist });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
 
 // Start the server
 app.listen(PORT, () => {
