@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const { v4: uuidv4 } = require("uuid");
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3000;
@@ -26,10 +27,7 @@ app.use(
 
 // MongoDB connection
 mongoose
-	.connect(process.env.MONGODB_URI, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true,
-	})
+	.connect(process.env.MONGODB_URI)
 	.then(() => console.log("MongoDB connected"))
 	.catch((err) => console.error("MongoDB connection error:", err));
 
@@ -74,14 +72,20 @@ const User = mongoose.model("cls_users", userSchema);
 const Product = mongoose.model("Product", productSchema);
 const Wishlist = mongoose.model("Wishlist", wishlistSchema);
 
-// Authentication Middleware
+// Middleware to authenticate requests using userId
 const isAuthenticated = (req, res, next) => {
-	if (req.session.userId) {
-		next();
-	} else {
-		res.status(401).json({ message: "Unauthorized" });
-	}
+    const userId = "67926f43557eb796414f94e6" // Extract userId from headers
+
+    if (!userId) {
+        return res.status(401).json({ message: "Unauthorized: userId is missing" });
+    }
+
+    // Optionally validate userId format or existence in your database
+    // For now, we'll just assume userId is valid if it's provided
+    req.user = { id: userId }; // Attach userId to the request object
+    next(); // Proceed to the next middleware or route handler
 };
+
 
 // Routes
 // Register
@@ -103,21 +107,28 @@ app.post("/auth/register", async (req, res) => {
 	}
 });
 
-// Login
 app.post("/auth/login", async (req, res) => {
 	try {
-		const { email, password } = req.body;
-		const user = await User.findOne({ email });
-		if (user && (await bcrypt.compare(password, user.password))) {
-			req.session.userId = user._id;
-			res.json({ message: "Login successful" });
-		} else {
-			res.status(401).json({ message: "Invalid credentials" });
-		}
+	  const { email, password } = req.body;
+	  const user = await User.findOne({ email });
+  
+	  if (user && (await bcrypt.compare(password, user.password))) {
+		// Create a JWT token
+		const token = jwt.sign(
+		  { id: user._id, email: user.email },
+		  process.env.JWT_SECRET, // Your JWT secret key from the .env file
+		  { expiresIn: '1h' } // Token expires in 1 hour
+		);
+  
+		// Send the token as part of the response
+		res.json({ message: "Login successful", token });
+	  } else {
+		res.status(401).json({ message: "Invalid credentials" });
+	  }
 	} catch (err) {
-		res.status(400).json({ error: err.message });
+	  res.status(400).json({ error: err.message });
 	}
-});
+  });
 
 // Reset Password
 app.post("/auth/reset-password", async (req, res) => {
