@@ -40,84 +40,33 @@ Node.js (v16 or later)
 
 MongoDB (local or cloud instance)
 
-# Git
 
-Installation
-
-Clone the repository:
-
-git clone https://github.com/yourusername/eco-marketplace.git
-
-Navigate to the project directory:
-
-cd eco-marketplace
-
-Install backend dependencies:
-
-cd backend
-npm install
-
-Install frontend dependencies:
-
-cd ../frontend
-npm install
-
-Create environment files:
-
-For the backend, create a .env file in the backend directory with the following variables:
-
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-
-Start MongoDB (if running locally):
-
-mongod
-
-Start the backend server:
-
-cd backend
-npm start
-
-Start the frontend server:
-
-cd ../frontend
-npm start
-
-Usage
-
-Open your browser and navigate to http://localhost:3000.
-
-Sign up to create an account.
-
-Add your products or browse products from other users.
-
-Enjoy a seamless buying and selling experience.
-
-Folder Structure
+# Folder Structure
 
 /
-|-- backend/         # Node.js backend code
-|-- frontend/        # React frontend code
+|-- server/         # Node.js backend code
+
+|--  client/        # React frontend code
+
 |-- README.md        # Project documentation
 
 # API Endpoints
 
 # Authentication
 
-POST /api/users/register - Register a new user
+POST /auth/register - Register a new user
 
-POST /api/users/login - Log in a user
+POST /auth/login - Log in a user
 
 # Products
 
-GET /api/products - Fetch all products
+GET /products - Fetch all products
 
-POST /api/products - Add a new product
+POST /products - Add a new product
 
-PUT /api/products/:id - Update a product
+PUT  /products/:id - Update a product
 
-DELETE /api/products/:id - Delete a product
+DELETE /products/:id - Delete a product
 
 Contributing
 
