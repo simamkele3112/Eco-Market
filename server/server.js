@@ -6,24 +6,28 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const { v4: uuidv4 } = require("uuid");
 const jwt = require('jsonwebtoken');
+const cors = require("cors");
 
 const app = express();
 const PORT = 3000;
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// CORS options
+const corsOptions = {
+    origin: "http://localhost:5173", // Allow only your frontend origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    credentials: true, // Allow cookies/session
+};
 
-const cors = require("cors");
+// Apply CORS middleware with options
+app.use(cors(corsOptions));
+app.use(express.json()); // For parsing JSON in request bodies
+app.use(express.urlencoded({ extended: true })); // For parsing URL-encoded data
 
-// Enable CORS for all routes
-app.use(
-	cors({
-		origin: "http://localhost:5173", // Allow only your frontend origin
-		methods: ["GET", "POST", "PUT", "DELETE"], // Allow the HTTP methods you need
-		credentials: true, // Allow cookies/session
-	})
-);
+// Example route for testing
+app.get("/api/test", (req, res) => {
+    res.json({ message: "CORS is working!" });
+});
+
 
 // MongoDB connection
 mongoose
