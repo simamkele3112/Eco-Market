@@ -253,4 +253,8 @@ const SignUp = () => {
   );
 };
  
+<<<<<<< HEAD
 export default SignUp;
+=======
+export default SignUp;
+>>>>>>> 282875795a3d0104281ae34c29652fe48e62017a
