@@ -1,24 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-
+import axios from "axios";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    username: "",
     password: "",
     confirmPassword: "",
     city: "",
-    state: "",
+    province: "",
     zip: "",
     agree: false,
   });
 
   const [errors, setErrors] = useState({});
-  const [firebaseError, setFirebaseError] = useState("");
   const formRef = useRef(null);
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -44,9 +41,8 @@ const SignUp = () => {
 
     if (!formData.firstName.trim()) newErrors.firstName = "First name is required.";
     if (!formData.lastName.trim()) newErrors.lastName = "Last name is required.";
-    if (!formData.username.trim()) newErrors.username = "Username is required.";
     if (!formData.city.trim()) newErrors.city = "City is required.";
-    if (!formData.state.trim()) newErrors.state = "Please select a state.";
+    if (!formData.province.trim()) newErrors.province = "Please select a province.";
     if (!formData.zip.trim() || !/^\d{3}$/.test(formData.zip))
       newErrors.zip = "Please provide a valid zip code.";
     if (!formData.agree) newErrors.agree = "You must agree to the terms.";
@@ -71,23 +67,26 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFirebaseError(""); // Reset previous Firebase error
 
     if (validate()) {
       try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          formData.username,
-          formData.password
-        );
-        console.log("User registered:", userCredential.user);
+        const address = `${formData.city}, ${formData.province}, ${formData.zip}`;
+        const userData = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          password: formData.password,
+          address,
+        };
+
+        // Save user to MongoDB
+        await axios.post("/api/users", userData);
         alert("Account created successfully!");
 
         // Navigate to login page after successful sign-up
         navigate("/login"); // Adjust route as needed
       } catch (error) {
         console.error("Error creating user:", error.message);
-        setFirebaseError(`Failed to create account: ${error.message}`);
+        alert("Failed to create account. Please try again.");
       }
     }
   };
@@ -126,20 +125,6 @@ const SignUp = () => {
             onChange={handleChange}
           />
           <div className="invalid-feedback">{errors.lastName}</div>
-        </div>
-        <div className="col-md-12">
-          <label htmlFor="username" className="form-label">
-            Email
-          </label>
-          <input
-            type="email"
-            className={`form-control ${errors.username ? "is-invalid" : ""}`}
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-          <div className="invalid-feedback">{errors.username}</div>
         </div>
         <div className="col-md-6">
           <label htmlFor="password" className="form-label">
@@ -184,23 +169,23 @@ const SignUp = () => {
           <div className="invalid-feedback">{errors.city}</div>
         </div>
         <div className="col-md-4">
-          <label htmlFor="state" className="form-label">
+          <label htmlFor="province" className="form-label">
             Province
           </label>
           <select
-            className={`form-select ${errors.state ? "is-invalid" : ""}`}
-            id="state"
-            name="state"
-            value={formData.state}
+            className={`form-select ${errors.province ? "is-invalid" : ""}`}
+            id="province"
+            name="province"
+            value={formData.province}
             onChange={handleChange}
           >
             <option value="" disabled>
               Choose...
             </option>
-            <option value="State1">Eastern Cape</option>
-            <option value="State2">Kwazulu-Natal</option>
+            <option value="Eastern Cape">Eastern Cape</option>
+            <option value="Kwazulu-Natal">Kwazulu-Natal</option>
           </select>
-          <div className="invalid-feedback">{errors.state}</div>
+          <div className="invalid-feedback">{errors.province}</div>
         </div>
         <div className="col-md-2">
           <label htmlFor="zip" className="form-label">
@@ -238,13 +223,6 @@ const SignUp = () => {
           </button>
         </div>
       </div>
-
-      {/* Display Firebase Error if any */}
-      {firebaseError && (
-        <div className="alert alert-danger mt-3 text-center" role="alert">
-          {firebaseError}
-        </div>
-      )}
 
       {/* Link to Login Page */}
       <div className="mt-3 text-center">
