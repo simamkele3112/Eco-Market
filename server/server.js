@@ -20,4 +20,5 @@ app.use("/auth", require("./routes/authRoutes"));
 app.use("/products", require("./routes/productRoutes"));
 app.use("/wishlist", require("./routes/wishlistRoutes"));
 
+
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

@@ -102,4 +102,13 @@ router.post("/update-password", async (req, res) => {
     }
 });
 
+// Check Authentication Status
+router.get("/status", (req, res) => {
+    if (req.session.userId) {
+        return res.json({ isAuthenticated: true });
+    } else {
+        return res.json({ isAuthenticated: false });
+    }
+});
+
 module.exports = router;
