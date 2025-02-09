@@ -4,26 +4,25 @@ import { useNavigate } from "react-router-dom";
 import SignUp from "./SignUp";
 
 const Login = () => {
-  const [isLogin, setIsLogin] = useState(true); // Toggle state for login and signup
+  const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef(null);
-  const loaderRef = useRef(null); // Ref for the loading animation
+  const loaderRef = useRef(null);
   const navigate = useNavigate();
 
-  // GSAP animation on form load
   useEffect(() => {
     gsap.fromTo(
       formRef.current,
       { opacity: 0, scale: 0.8 },
       { opacity: 1, scale: 1, duration: 1, ease: "power2.out" }
     );
-  }, [isLogin]); // Re-run animation when switching forms
+  }, [isLogin]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,24 +34,16 @@ const Login = () => {
 
   const validate = () => {
     const newErrors = {};
-
     if (!formData.email.trim()) newErrors.email = "Email is required.";
     if (!formData.password.trim()) newErrors.password = "Password is required.";
-
     setErrors(newErrors);
-
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validate()) {
-      setIsLoading(true); // Start loading animation
-      gsap.fromTo(
-        loaderRef.current,
-        { opacity: 0, scale: 0.8 },
-        { opacity: 1, scale: 1, duration: 0.5, ease: "power2.inOut", repeat: -1, yoyo: true }
-      );
+      setIsLoading(true);
 
       try {
         const endpoint = isLogin
@@ -71,7 +62,12 @@ const Login = () => {
 
         if (response.ok) {
           console.log("Server Response:", result);
-          navigate("/"); // Redirect to dashboard or home page
+
+          // Store the token in localStorage
+          localStorage.setItem("token", result.token);
+
+          // Redirect to dashboard or home page
+          navigate("/");
         } else {
           setServerError(result.message || "An error occurred.");
         }
@@ -79,8 +75,7 @@ const Login = () => {
         console.error("Error:", error);
         setServerError("Something went wrong. Please try again later.");
       } finally {
-        setIsLoading(false); // Stop loading animation
-        gsap.to(loaderRef.current, { opacity: 0, scale: 0.8, duration: 0.5 });
+        setIsLoading(false);
       }
     } else {
       setServerError("");
@@ -89,11 +84,6 @@ const Login = () => {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-      {/* Loading animation */}
-      <div className="loading-overlay" ref={loaderRef} style={{ display: isLoading ? "flex" : "none" }}>
-        <div className="spinner"></div>
-      </div>
-
       {isLogin ? (
         <form
           className="container p-4 bg-white rounded shadow-lg"

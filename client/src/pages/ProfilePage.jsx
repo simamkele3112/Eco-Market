@@ -1,34 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Profile from "../components/Profile";
 import Login from "../components/Login";
 
 const ProfilePage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuthentication();
-  }, []);
-
-  const checkAuthentication = async () => {
+  const checkAuthentication = useCallback(async () => {
     try {
+      const token = localStorage.getItem("token"); // Retrieve JWT from localStorage or sessionStorage
+
+      if (!token) {
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
       const response = await fetch("http://localhost:3000/auth/status", {
-        credentials: "include", // Ensure cookies are sent for session-based auth
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}`, // Attach JWT in the Authorization header
+          "Content-Type": "application/json",
+        },
+         credentials: "include",
       });
+
       const data = await response.json();
-      setIsAuthenticated(data.isAuthenticated);
+
+      if (response.ok) {
+        setIsAuthenticated(data.isAuthenticated);
+      } else {
+        localStorage.removeItem("token"); // Clear invalid token
+        setIsAuthenticated(false);
+      }
     } catch (error) {
       console.error("Error checking authentication:", error);
       setIsAuthenticated(false);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  if (isAuthenticated === null) {
-    return <p className="text-center text-muted">Checking authentication...</p>;
+  useEffect(() => {
+    checkAuthentication();
+  }, [checkAuthentication]);
+
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" role="status"></div>
+      </div>
+    );
   }
 
- 
-  
-  return isAuthenticated ? <Profile /> : <Login />;
+  return isAuthenticated ? (
+    <Profile refreshAuth={checkAuthentication} />
+  ) : (
+    <Login refreshAuth={checkAuthentication} />
+  );
 };
 
 export default ProfilePage;
