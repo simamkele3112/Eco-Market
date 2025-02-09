@@ -161,12 +161,23 @@ const Profile = () => {
         <h3 className="fw-bold mt-3">{profile.name + " " + profile.surname || "Full Name Unknown"}</h3>
         <p className="text-muted">{profile.bio || "Add a short bio about yourself."}</p>
         <p className="text-muted">{profile.location || "Location not specified"}</p>
-        <button className="btn btn-outline-primary" onClick={toggleEdit}>
-          {isEditing ? "Cancel" : "Edit Profile"}
-        </button>
-        <button className="btn btn-outline-danger mt-3" onClick={logout}>
-          Logout
-        </button>
+      </div>
+
+      {/* Wishlist Count Section */}
+      <div className="d-flex justify-content-between align-items-center">
+        <div className="text-muted">
+          <strong>Wishlist : </strong>
+          <a href="/Wishlist count" className="link-primary">{profile.wishlistCount || 0}- View WishList</a>
+        </div>
+        <div>
+          {/* Edit Profile and Logout Buttons */}
+          <button className="btn btn-outline-primary me-2" onClick={toggleEdit}>
+            {isEditing ? "Cancel" : "Edit Profile"}
+          </button>
+          <button className="btn btn-outline-danger" onClick={logout}>
+            Logout
+          </button>
+        </div>
       </div>
 
       {/* Profile Stats */}
@@ -308,7 +319,7 @@ const Profile = () => {
         </div>
       )}
     </div>
-  );
+  ); 
 };
 
 export default Profile;
