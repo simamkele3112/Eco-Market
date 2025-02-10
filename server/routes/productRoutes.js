@@ -13,7 +13,7 @@ const isAuthenticated = (req, res, next) => {
 };
 
 // Create Product
-router.post("/", isAuthenticated, async (req, res) => {
+router.post("/products", isAuthenticated, async (req, res) => {
     try {
         const { name, description, price, location, condition, imageUrls } = req.body;
         const product = new Product({ name, description, price, location, condition, imageUrls, owner: req.session.userId });
