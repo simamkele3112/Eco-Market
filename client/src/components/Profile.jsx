@@ -100,6 +100,7 @@ const Profile = () => {
 
   const logout = () => {
     localStorage.removeItem("token"); // Remove JWT from localStorage
+    localStorage.removeItem("userLocation")
     navigate("/login"); // Redirect to login page
   };
 
@@ -162,6 +163,10 @@ const Profile = () => {
         <p className="text-muted">{profile.bio || "Add a short bio about yourself."}</p>
         <p className="text-muted">{profile.location || "Location not specified"}</p>
       </div>
+
+       // setlocation of user in localStorage
+
+       { localStorage.setItem("userLocation",profile.address)}
 
       {/* Wishlist Count Section */}
       <div className="d-flex justify-content-between align-items-center">
