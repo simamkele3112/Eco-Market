@@ -33,10 +33,11 @@ const SellItem = () => {
     itemImages.forEach((image) => formData.append('itemImages', image));
 
     try {
-      const response = await fetch('http://your-backend-api.com/sell-item', {
+      const response = await fetch('http://localhost:3000/products/products', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
+          "Content-Type": "application/json",
         },
         body: formData,
       });
