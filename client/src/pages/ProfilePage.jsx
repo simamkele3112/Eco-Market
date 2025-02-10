@@ -26,9 +26,7 @@ const ProfilePage = () => {
     return <p className="text-center text-muted">Checking authentication...</p>;
   }
 
-  if(!isAuthenticated){
-    alert("is Authenticated status" +isAuthenticated )
-  }
+ 
   
   return isAuthenticated ? <Profile /> : <Login />;
 };
