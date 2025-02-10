@@ -1,10 +1,21 @@
 const express = require("express");
+const session = require("express-session");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { body, validationResult } = require("express-validator");
 const User = require("../models/User");
 
 const router = express.Router();
+
+// 🔹 Configure Express-Session Middleware
+router.use(
+	session({
+		secret: process.env.SESSION_SECRET, // Use a strong secret
+		resave: false,
+		saveUninitialized: false,
+		cookie: { secure: false, httpOnly: true, maxAge: 3600000 }, // 1 hour
+	})
+);
 
 // Middleware to verify JWT token
 const authenticateToken = (req, res, next) => {
@@ -72,7 +83,7 @@ router.post(
 	}
 );
 
-// 📌 Login Route
+// 📌 Login Route (Stores user ID in session)
 router.post("/login", async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -86,6 +97,9 @@ router.post("/login", async (req, res) => {
 		const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
 			expiresIn: "1h",
 		});
+
+		// 🔹 Store user ID in the session
+		req.session.userId = user._id;
 
 		res.json({ message: "Login successful", token });
 	} catch (err) {
@@ -150,9 +164,14 @@ router.post("/password-reset", async (req, res) => {
 	}
 });
 
-// 📌 Logout (Client should handle token removal)
+// 📌 Logout Route (Destroy Session)
 router.post("/logout", (req, res) => {
-	res.json({ message: "Logout successful (Client should remove token)" });
+	req.session.destroy((err) => {
+		if (err) {
+			return res.status(500).json({ error: "Logout failed" });
+		}
+		res.json({ message: "Logged out successfully" });
+	});
 });
 
 module.exports = router;

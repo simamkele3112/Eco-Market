@@ -53,17 +53,11 @@ const ProfilePage = () => {
     );
   }
 
-<<<<<<< HEAD
- 
-  
-  return isAuthenticated ? <Profile /> : <Login />;
-=======
   return isAuthenticated ? (
     <Profile refreshAuth={checkAuthentication} />
   ) : (
     <Login refreshAuth={checkAuthentication} />
   );
->>>>>>> e9bcc5f09dafc0383f7b68d841a12666195f2579
 };
 
 export default ProfilePage;
