@@ -5,7 +5,11 @@ import NavBar from './NavBar';
 const MainNavBar = () => {
   const location = useLocation(); // Get the current URL
   const currentPath = location.pathname; // Get the pathname
+    
+    const logedIn = localStorage.getItem("token");
 
+
+  
   // Check if the current path is '/' to display the second nav
   const showSecondNav = currentPath === '/';
 
@@ -76,9 +80,20 @@ const MainNavBar = () => {
                 </li>
               </ul>
             </div>
-            <Link className="text-light" to="/user-profile">
+
+          
+           
+        
+            {
+            
+            logedIn ?  <Link className="text-light" to="/user-profile">
               <i className="fas fa-user fs-3"></i>
+            </Link>:  <Link className="text-dark" to="/user-profile">
+              <i className="fas fa-user fs-3 text-dark"></i>
             </Link>
+             } 
+           
+          
           </div>
         </nav>
 

@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 const NavBar=()=>{
 
-
+  const logedIn = localStorage.getItem("token");
     return<>
  
  <div className="second-nav d-flex justify-content-between align-items-center g-3 container-fluid pb-3  container  bg-success">
@@ -86,9 +86,17 @@ const NavBar=()=>{
             </button>
           </div>
 
-          <Link to="/location" className="text-white">
-            <i className="fas fa-map-marker-alt"></i> Cape Town
+        
+
+          {
+            
+            logedIn ?    <Link to="/location" className="text-white">
+            <i className="fas fa-map-marker-alt"></i>{ localStorage.getItem("userLocation")}
+          </Link>:  <Link to="/location" className="text-white">
+            <i className="fas fa-map-marker-alt"></i>
           </Link>
+
+             } 
         </div>
     </>
 }
