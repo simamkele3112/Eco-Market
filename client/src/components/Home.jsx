@@ -53,12 +53,12 @@ const Home = () => {
           <h1 className="mb-4">Shop Our Products</h1>
           <div className="row row-cols-1 row-cols-md-3 g-4">
             {[
-              { title: "M5 Smart Monitor", price: "R7,000", description: "Upgrade your workspace with the sleek and powerful M5 smart monitor.", imgSrc: "../../../public/selling-p/m5.png" },
-              { title: "16 Way DB-Box", price: "R700", description: "A reliable DB-box to manage your electrical needs effortlessly.", imgSrc: "../../../public/selling-p/db.jpg" },
-              { title: "Golf R", price: "R20", description: "Gold R premium product for an exceptional value.", imgSrc: "../../../public/selling-p/R.jpg" },
-              { title: "Polo Vivo", price: "R20,000", description: "Experience luxury on a budget with the Polo Vivo.", imgSrc: "../../../public/selling-p/golfR.jpg" },
-              { title: "C1 Bringer Microphone", price: "R9,000", description: "Capture studio-quality sound with the C1 Bringer microphone.", imgSrc: "../../../public/selling-p/mic.jpg" },
-              { title: "Sound bar", price: "R9,000", description: "Selling my 4 months old sound bar still working as new ", imgSrc: "../../../public/selling-p/sound.jpg" },
+              { title: "M5 Smart Monitor", price: "R7,000", description: "Upgrade your workspace with the sleek and powerful M5 smart monitor.", imgSrc: "../../../selling-p/m5.png" },
+              { title: "16 Way DB-Box", price: "R700", description: "A reliable DB-box to manage your electrical needs effortlessly.", imgSrc: "../../../selling-p/db.jpg" },
+              { title: "Golf R", price: "R20", description: "Gold R premium product for an exceptional value.", imgSrc: "../../../selling-p/R.jpg" },
+              { title: "Polo Vivo", price: "R20,000", description: "Experience luxury on a budget with the Polo Vivo.", imgSrc: "../../../selling-p/golfR.jpg" },
+              { title: "C1 Bringer Microphone", price: "R9,000", description: "Capture studio-quality sound with the C1 Bringer microphone.", imgSrc: "../../../selling-p/mic.jpg" },
+              { title: "Sound bar", price: "R9,000", description: "Selling my 4 months old sound bar still working as new ", imgSrc: "../../../selling-p/sound.jpg" },
             ].map((item, index) => (
               <div className="col" key={index}>
                 <div className="card h-100 shadow-sm border-0">

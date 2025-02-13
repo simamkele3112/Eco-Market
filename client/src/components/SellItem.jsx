@@ -21,46 +21,48 @@ const SellItem = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
-    setIsSubmitting(true);
+  event.preventDefault();
+  setIsSubmitting(true);
 
-    const formData = new FormData();
-    formData.append('itemName', itemName);
-    formData.append('itemDescription', itemDescription);
-    formData.append('itemPrice', itemPrice);
-    formData.append('itemCategory', itemCategory);
-    formData.append('itemCondition', itemCondition);
-    itemImages.forEach((image) => formData.append('itemImages', image));
+  const formData = new FormData();
+  formData.append('itemName', itemName);
+  formData.append('itemDescription', itemDescription);
+  formData.append('itemPrice', itemPrice);
+  formData.append('itemCategory', itemCategory);
+  formData.append('itemCondition', itemCondition);
+  itemImages.forEach((image) => formData.append('itemImages', image));
 
-    try {
-      const response = await fetch('http://localhost:3000/products/products', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          "Content-Type": "application/json",
-        },
-        body: formData,
-      });
+  try {
+    const response = await fetch('http://localhost:3000/products', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+        // Remove this line:
+        // "Content-Type": "application/json",
+      },
+      body: formData,
+    });
 
-      const result = await response.json();
+    const result = await response.json();
 
-      if (response.ok) {
-        alert('Your item has been successfully listed for sale!');
-        setItemName('');
-        setItemDescription('');
-        setItemPrice('');
-        setItemCategory('');
-        setItemCondition('');
-        setItemImages([]);
-      } else {
-        alert(result.message || 'Something went wrong. Please try again.');
-      }
-    } catch (error) {
-      alert('Error submitting the form. Please try again later.');
+    if (response.ok) {
+      alert('Your item has been successfully listed for sale!');
+      setItemName('');
+      setItemDescription('');
+      setItemPrice('');
+      setItemCategory('');
+      setItemCondition('');
+      setItemImages([]);
+    } else {
+      alert(result.message || 'Something went wrong. Please try again.');
     }
+  } catch (error) {
+    alert('Error submitting the form. Please try again later.');
+  }
 
-    setIsSubmitting(false);
-  };
+  setIsSubmitting(false);
+};
+
 
   if (!isLoggedIn) {
     return (
