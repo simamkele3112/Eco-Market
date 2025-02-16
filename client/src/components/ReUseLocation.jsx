@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { gsap } from "gsap";
+import React, { useState, useEffect } from 'react';
+import gsap from 'gsap';
 
-const ReUseLocation = () => {
+const ReUseLocation = ({ setLocation }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
@@ -11,9 +11,7 @@ const ReUseLocation = () => {
 
     if (inputValue.length > 2) {
       const apiKey = "f5e9e591c4004f16be81bfa598de8b3a";
-      const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(
-        inputValue
-      )}&apiKey=${apiKey}`;
+      const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(inputValue)}&apiKey=${apiKey}`;
 
       try {
         const response = await fetch(url);
@@ -22,29 +20,33 @@ const ReUseLocation = () => {
           (feature) => feature.properties.formatted
         );
         setSuggestions(newSuggestions);
-
-        // GSAP Animation for suggestions
-        gsap.fromTo(
-          ".suggestion-item",
-          { opacity: 0, y: -10 },
-          { opacity: 1, y: 0, duration: 0.3, stagger: 0.1 }
-        );
       } catch (error) {
         console.error("Error fetching location suggestions:", error);
       }
     } else {
-      setSuggestions([]); // Clear suggestions if input is too short
+      setSuggestions([]);
     }
   };
 
   const handleSuggestionClick = (suggestion) => {
     setQuery(suggestion);
-    setSuggestions([]); // Clear suggestions after selection
+    setLocation(suggestion); // 🔹 Update location in SellItem
+    setSuggestions([]);
   };
 
+  useEffect(() => {
+    if (suggestions.length > 0) {
+      gsap.fromTo(
+        ".suggestion-item",
+        { opacity: 0, y: -10 },
+        { opacity: 1, y: 0, duration: 0.3, stagger: 0.1 }
+      );
+    }
+  }, [suggestions]); // Trigger animation when suggestions change
+
   return (
-     <>
-      <div className="mb-3 cols-3 ">
+    <>
+      <div className="mb-3">
         <input
           type="text"
           className="form-control"
@@ -67,11 +69,7 @@ const ReUseLocation = () => {
           ))}
         </ul>
       )}
-
-     </>
-      
-      
- 
+    </>
   );
 };
 

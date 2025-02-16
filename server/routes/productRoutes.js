@@ -34,25 +34,34 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // 🔹 Create Product (Protected)
-
-// Create Product (Protected)
 router.post(
 	"/",
 	authenticateToken,
 	upload.array("itemImages"),
 	async (req, res) => {
 		try {
-			const { name, description, price, location, condition } = req.body;
-			const imageUrls = req.files.map((file) => file.path); // Map the uploaded file paths
+			console.log("Request Body:", req.body);
+			const {
+				name,
+				description,
+				price,
+				category,
+				condition,
+				location,
+				offerDelivery,
+			} = req.body;
+			const imageUrls = req.files.map((file) => file.path);
 
 			const product = new Product({
 				name,
 				description,
 				price,
-				location,
+				category,
 				condition,
-				imageUrls, // Store the file paths in the database
-				owner: req.user.id, // Extracted from JWT token
+				location,
+				offerDelivery: offerDelivery === "true",
+				imageUrls,
+				userId: req.user.userId,
 			});
 
 			await product.save();
